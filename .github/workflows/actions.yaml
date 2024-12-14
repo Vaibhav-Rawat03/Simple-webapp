@@ -22,14 +22,11 @@ jobs:
 
           sudo chmod a+r /etc/apt/keyrings/docker.asc
 
-
-          # Add Docker repository to Apt sources
-
           echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | \
             sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
           sudo apt-get update
       - name: Install Docker
-        run: >
+        run: |
           sudo apt-get install -y docker-ce docker-ce-cli containerd.io
           docker-buildx-plugin docker-compose-plugin
       - name: Check if Docker is working
@@ -41,9 +38,6 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Check docker is working fine
         run: docker ps
-      # - name: Build Docker image
-      #   run: docker build -t ${{ secrets.DOCKER_USERNAME }}/simple-webapp .
-
       - name: Check current dir
         run: pwd
       - name: Push Docker image
@@ -56,17 +50,14 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v3
-      - name: Download and install Minikube
+      - name: SSh to ec2 with minkube
+        run: ssh -i K8s.pem ubuntu@13.234.136.113 -y
+      - name: Clone project
+        run: git clone https://github.com/Vaibhav-Rawat03/Simple-webapp.git .
+      - name: Start minikube
+        run: minkube start
+      - name: Deploy to Kubernetes with Helm
         run: >
-          curl -LO
-          https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-
-          sudo install minikube-linux-amd64 /usr/local/bin/minikube
-
-          rm minikube-linux-amd64
-      - name: Start Minikube
-        run: minikube start
-      - name: Deploy to Kubernetes
-        run: kubectl apply -f my-app-service.yaml
-      - name: Get IP of Minikube instance
-        run: minikube ip
+          helm upgrade --install simple-webapp ./helm-chart \
+            --set image.repository=${{ secrets.DOCKER_USERNAME }}/simple-webapp \
+            --set image.tag=latest
