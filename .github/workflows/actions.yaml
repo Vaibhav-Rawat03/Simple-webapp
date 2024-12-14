@@ -69,7 +69,7 @@ jobs:
         run: docker pull vaibhavrawat/simple-webapp
 
       - name: Start minikube
-        run: minkube start
+        run: minikube start
       - name: Deploy to Kubernetes with Helm
         run: |
           helm upgrade --install simple-webapp ./helm-chart \
