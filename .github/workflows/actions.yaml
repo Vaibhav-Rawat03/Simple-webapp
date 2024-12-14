@@ -47,25 +47,20 @@ jobs:
         run: |
           docker push vaibhavrawat/simple-webapp
 
-          
-  # deploy:
-  #   needs: build
-  #   runs-on: ubuntu-latest
-  #   steps:
-  #     - name: Checkout code
-  #       uses: actions/checkout@v3
-
-  #     - name: SSh to ec2 with minikube
-  #       run: ssh -i K8s.pem ubuntu@13.234.136.113 -y
-
-  #     - name: Clone project
-  #       run: git clone https://github.com/Vaibhav-Rawat03/Simple-webapp.git .
-
-  #     - name: Start minikube
-  #       run: minikube start
-
-  #     - name: Deploy to Kubernetes with Helm
-  #       run: |
-  #         helm upgrade --install simple-webapp ./helm-chart \
-  #           --set image.repository=${{ secrets.DOCKER_USERNAME }}/simple-webapp \
-  #           --set image.tag=latest
+  deploy:
+  needs: build
+  runs-on: ubuntu-latest
+  steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    - name: SSh to ec2 with minkube
+      run: ssh -i K8s.pem ubuntu@13.234.136.113 -y
+    - name: Clone project
+      run: git clone https://github.com/Vaibhav-Rawat03/Simple-webapp.git .
+    - name: Start minikube
+      run: minkube start
+    - name: Deploy to Kubernetes with Helm
+      run: |
+        helm upgrade --install simple-webapp ./helm-chart \
+          --set image.repository=${{ secrets.DOCKER_USERNAME }}/simple-webapp \
+          --set image.tag=latest
