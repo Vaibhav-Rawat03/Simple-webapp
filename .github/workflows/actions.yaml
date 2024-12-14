@@ -54,10 +54,10 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
       
-      # - name: SSh to ec2 with minkube
-      #   run: ssh -i ${{secrets.PEM_FILE}} ubuntu@13.234.136.113 -y
-      # - name: Clone project
-      #   run: git clone https://github.com/Vaibhav-Rawat03/Simple-webapp.git .
+      - name: SSh to ec2 with minkube
+        run: ssh -i ${{secrets.PEM_FILE}} ubuntu@13.234.136.113 -y
+      - name: Clone project
+        run: git clone https://github.com/Vaibhav-Rawat03/Simple-webapp.git .
 
       - name: Pull docker image
         run: docker pull vaibhavrawat/simple-webapp
