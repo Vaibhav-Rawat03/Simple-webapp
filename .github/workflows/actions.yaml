@@ -41,10 +41,15 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Check docker is working fine
         run: docker ps
-      - name: Build Docker image
-        run: docker build -t ${{ secrets.DOCKER_USERNAME }}/simple-webapp .
+      # - name: Build Docker image
+      #   run: docker build -t ${{ secrets.DOCKER_USERNAME }}/simple-webapp .
+
+      - name: Check current dir
+        run: pwd
       - name: Push Docker image
-        run: docker push ${{ secrets.DOCKER_USERNAME }}/simple-webapp
+        run: docker build -t vaibhavrawat/simple-webapp .
+      - name: Push Docker image
+        run: docker push vaibhavrawat/simple-webapp
   deploy:
     needs: build
     runs-on: ubuntu-latest
