@@ -57,7 +57,13 @@ jobs:
       # - name: SSh to ec2 with minkube
       #   run: ssh -i ${{secrets.PEM_FILE}} ubuntu@13.234.136.113 -y
       - name: Clone project
-        run: git clone https://github.com/Vaibhav-Rawat03/Simple-webapp.git .
+        run: git clone https://github.com/Vaibhav-Rawat03/Simple-webapp.git
+
+      - name: ls
+        run: ls -la 
+
+      - name: Go to Simple-webapp
+        run: cd Simple-webapp
 
       - name: Pull docker image
         run: docker pull vaibhavrawat/simple-webapp
