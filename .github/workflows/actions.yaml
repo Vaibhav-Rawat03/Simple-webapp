@@ -11,17 +11,21 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v3
       - name: Add Docker's GPG key and repository
-        run: |
-          sudo apt-get update sudo apt-get install -y ca-certificates curl sudo
-          install -m 0755 -d /etc/apt/keyrings sudo curl -fsSL
-          https://download.docker.com/linux/ubuntu/gpg -o
-          /etc/apt/keyrings/docker.asc sudo chmod a+r
-          /etc/apt/keyrings/docker.asc # Add Docker repository to Apt sources
-          echo "deb [arch=$(dpkg --print-architecture)
-          signed-by=/etc/apt/keyrings/docker.asc]
-          https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo
-          "$VERSION_CODENAME") stable" | \
-            sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+        run: >
+          sudo apt-get update
+
+          sudo apt-get install -y ca-certificates curl
+
+          sudo install -m 0755 -d /etc/apt/keyrings
+
+          sudo curl -fsSL https://download.docker.com/linux/ubuntu/gpg -o /etc/apt/keyrings/docker.asc
+
+          sudo chmod a+r /etc/apt/keyrings/docker.asc
+
+          # Add Docker repository to Apt sources
+
+          echo "deb [arch=$(dpkg --print-architecture) signed-by=/etc/apt/keyrings/docker.asc] https://download.docker.com/linux/ubuntu $(. /etc/os-release && echo "$VERSION_CODENAME") stable" | sudo tee /etc/apt/sources.list.d/docker.list > /dev/null
+
           sudo apt-get update
       - name: Install Docker
         run: >
@@ -36,27 +40,32 @@ jobs:
           password: ${{ secrets.DOCKER_PASSWORD }}
       - name: Check docker is working fine
         run: docker ps
-      - name: Check current dir
-        run: pwd
-      - name: Push Docker image
-        run: docker build -t vaibhavrawat/simple-webapp .
-      - name: Push Docker image
-        run: docker push vaibhavrawat/simple-webapp
-  deploy:
-    needs: build
-    runs-on: ubuntu-latest
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v3
-      - name: Download and install Minikube
+      - name: Build Docker image
         run: |
-          curl -LO
-          https://storage.googleapis.com/minikube/releases/latest/minikube-linux-amd64
-          sudo install minikube-linux-amd64 /usr/local/bin/minikube rm
-          minikube-linux-amd64
-      - name: Start Minikube
-        run: minikube start
-      - name: Deploy to Kubernetes
-        run: kubectl apply -f my-app-service.yaml
-      - name: Get IP of Minikube instance
-        run: minikube ip
+          docker build -t vaibhavrawat/simple-webapp .
+      - name: Push Docker image
+        run: |
+          docker push vaibhavrawat/simple-webapp
+
+          
+  # deploy:
+  #   needs: build
+  #   runs-on: ubuntu-latest
+  #   steps:
+  #     - name: Checkout code
+  #       uses: actions/checkout@v3
+
+  #     - name: SSh to ec2 with minikube
+  #       run: ssh -i K8s.pem ubuntu@13.234.136.113 -y
+
+  #     - name: Clone project
+  #       run: git clone https://github.com/Vaibhav-Rawat03/Simple-webapp.git .
+
+  #     - name: Start minikube
+  #       run: minikube start
+
+  #     - name: Deploy to Kubernetes with Helm
+  #       run: |
+  #         helm upgrade --install simple-webapp ./helm-chart \
+  #           --set image.repository=${{ secrets.DOCKER_USERNAME }}/simple-webapp \
+  #           --set image.tag=latest
