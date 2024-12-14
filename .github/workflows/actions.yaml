@@ -39,6 +39,8 @@ jobs:
         with:
           username: ${{ secrets.DOCKER_USERNAME }}
           password: ${{ secrets.DOCKER_PASSWORD }}
+      - name: Check docker is working fine
+        run: docker ps
       - name: Build Docker image
         run: docker build -t ${{ secrets.DOCKER_USERNAME }}/simple-webapp .
       - name: Push Docker image
